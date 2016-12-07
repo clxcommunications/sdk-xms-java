@@ -161,17 +161,47 @@ Future&lt;MtBatchTextSmsResult&gt; future =
 </pre></div></div>
 <p>The callback that we provided to this method will have one of its methods invoked as soon as the communication with XMS has concluded. Which of the methods that is invoked will depend on how the request went. If all went well then the <tt>completed</tt> method will be called with the result as argument. If some form of exception was thrown during the request then the <tt>failed</tt> method will be called with the exception as argument. For more about error handling see sec. <a href="#Handling_errors">Handling errors</a>. Finally, if the request was canceled, for example using <tt>future.cancel(true)</tt>, then the <tt>cancelled</tt> method is called.</p></div>
 <div class="section">
-<h2><a name="Fetching_batches"></a>Fetching batches</h2></div>
+<h2><a name="Listing_batches"></a>Listing batches</h2>
+<p>Once you have created a few batches it may be interesting to retrieve a list of all your batches. Retrieving listings of batches is done through a <i>paged result</i>. This means that a single request to XMS may not retrieve all batches. As a result, when calling the <tt>fetchBatches</tt> method on your connection object it will not simply return a list of batches but rather a <a href="apidocs/index.html?com/clxcommunications/xms/PagedFetcher.html"><tt>PagedFetcher</tt></a> object. The paged fetcher in turn can be used to fetch specific pages, iterate over all pages, or directly iterate over all batches while transparently performing necessary page requests.</p>
+<p>To limit the number of fetched batches it is also possible to supply a filter that will restrict the fetched batches, for example to those sent after a particular date or having a specific tag or sender.</p>
+<p>More specifically, to print the identifier of each batch sent on 2016-12-01 and having the &#x201c;signup-notification&#x201d; tag we may write something like the following.</p>
+
+<div class="source">
+<div class="source"><pre class="prettyprint">BatchFilter filter = ClxApi.batchFilter()
+    .addTag(&quot;signup-notification&quot;)
+    .startDate(LocalDate.of(2016, 12, 1))
+    .endDate(LocalDate.of(2016, 12, 2))
+    .build();
+
+PagedFetcher&lt;MtBatchSmsResult&gt; fetcher = conn.fetchBatches(filter);
+
+for (MtBatchTextSmsResult batch : fetcher.elements()) {
+    System.out.println(&quot;Batch ID: &quot; + batch.id());
+}
+</pre></div></div></div>
 <div class="section">
-<h2><a name="Handling_errors"></a>Handling errors</h2></div>
+<h2><a name="Handling_errors"></a>Handling errors</h2>
+<p>Any error that occurs during an API operation will result in an exception being thrown. The exceptions produced specifically by the SDK are</p>
+
+<dl>
+<dt><a href="apidocs/index.html?com/clxcommunications/xms/ConcurrentException.html"><tt>ConcurrentException</tt></a></dt>
+<dd>This exception wraps other checked exceptions that may occur during an XMS request, for example if the XMS server response contains invalid JSON then this exception will be thrown and calling <tt>getCause()</tt> on this exception will return a <tt>JsonParseException</tt> object coming from the <a class="externalLink" href="http://wiki.fasterxml.com/JacksonHome">Jackson</a> JSON library.</dd>
+<dt><a href="apidocs/index.html?com/clxcommunications/xms/ErrorResponseException.html"><tt>ErrorResponseException</tt></a></dt>
+<dd>If the XMS server responded with a JSON error object containing an error code and error description.</dd>
+<dt><a href="apidocs/index.html?com/clxcommunications/xms/UnauthorizedException.html"><tt>UnauthorizedException</tt></a></dt>
+<dd>Thrown if an incorrect authentication token was provided for the service plan.</dd>
+<dt><a href="apidocs/index.html?com/clxcommunications/xms/UnexpectedResponseException.html"><tt>UnexpectedResponseException</tt></a></dt>
+<dd>If the HTTP response from XMS server had an HTTP status that the SDK did not expect and cannot handle, the exception object will contain the complete HTTP response.</dd>
+</dl>
+<p>each of these exceptions inherit from the base class <a href="apidocs/index.html?com/clxcommunications/xms/ApiException.html"><tt>ApiException</tt></a>.</p></div>
 <div class="section">
 <h2><a name="Custom_connections"></a>Custom connections</h2>
 <p>For most typical use cases the users of the XMS SDK do not have to worry about its internals. However, for some specialized cases the SDK does allow deep access. In particular, if you have special needs concerning the way the SDK does HTTP traffic you can tell the SDK in the API connection to use a Apache HTTP Async Client of your choice. Do note, however, that in such cases the SDK assumes the client is started up and torn down externally to the API connection.</p>
-<p>For example, consider a use case where you have two XMS service plans and you wish them to simultaneously interact with XMS from the same application. It may in this case be beneficial to maintain a single connection pool towards XMS for both plans. This requires creating a suitable instance of the <a class="externalLink" href="https://hc.apache.org/httpcomponents-asyncclient-dev/httpasyncclient/apidocs/org/apache/http/nio/client/HttpAsyncClient.html"><tt>HttpAsyncClient</tt></a> class and using it when initializing the API connection. Note, the XMS SDK provides a concrete client class with a suitable configuration for XMS called <a href="apidocs/index.html?com/clxcommunications/xms/ApiDefaultHttpAsyncClient.html"><tt>ApiDefaultHttpAsyncClient</tt></a>.</p>
+<p>For example, consider a use case where you have two XMS service plans and you wish them to simultaneously interact with XMS from the same application. It may in this case be beneficial to maintain a single connection pool towards XMS for both plans. This requires creating a suitable instance of the <a class="externalLink" href="https://hc.apache.org/httpcomponents-asyncclient-dev/httpasyncclient/apidocs/org/apache/http/nio/client/HttpAsyncClient.html"><tt>HttpAsyncClient</tt></a> class and using it when initializing the API connection. Note, the XMS SDK provides a concrete client class with a suitable configuration for XMS called <a href="apidocs/index.html?com/clxcommunications/xms/ApiHttpAsyncClient.html"><tt>ApiHttpAsyncClient</tt></a>.</p>
 <p>Thus, sharing the default HTTP client between two connections may in practice be accomplished with code such at the following.</p>
 
 <div class="source">
-<div class="source"><pre class="prettyprint">HttpClient client = new ApiDefaultHttpAsyncClient();
+<div class="source"><pre class="prettyprint">HttpClient client = ApiHttpAsyncClient.of();
 client.start()
 
 ApiConnection conn1 = ApiConnection.builder()
