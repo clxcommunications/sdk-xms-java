@@ -44,7 +44,8 @@ public class MtBatchTextSmsCreateTest {
 		        "  'type': 'mt_text',",
 		        "  'from': '1234',",
 		        "  'to': [ '987654321' ],",
-		        "  'body': 'Hello, world!'",
+		        "  'body': 'Hello, world!',",
+		        "  'max_number_of_message_parts': 1",
 		        "}").replace('\'', '"');
 
 		String actual = json.writeValueAsString(input);
@@ -55,6 +56,43 @@ public class MtBatchTextSmsCreateTest {
 	@Test
 	public void canDeserializeMinimal() throws Exception {
 		MtBatchSmsCreate expected = minimalBatchBuilder().build();
+
+		String input = json.writeValueAsString(expected);
+
+		MtBatchSmsCreate actual =
+		        json.readValue(input, MtBatchSmsCreate.class);
+
+		assertThat(actual, is(expected));
+	}
+	
+	@Test
+	public void canSerializeWithoutSender() throws Exception {
+		MtBatchSmsCreate input = ClxApi.batchTextSms()
+		        .addRecipient("987654321")
+		        .body("Hello, world!")
+		        .maxNumberOfMessageParts(1)
+		        .build();
+
+		String expected = Utils.join("\n",
+		        "{",
+		        "  'type': 'mt_text',",
+		        "  'to': [ '987654321' ],",
+		        "  'body': 'Hello, world!',",
+		        "  'max_number_of_message_parts': 1",
+		        "}").replace('\'', '"');
+
+		String actual = json.writeValueAsString(input);
+
+		assertThat(actual, is(TestUtils.jsonEqualTo(expected)));
+	}
+	
+	@Test
+	public void canDeserializeWithoutSender() throws Exception {
+		MtBatchSmsCreate expected = ClxApi.batchTextSms()
+		        .addRecipient("987654321")
+		        .body("Hello, world!")
+		        .maxNumberOfMessageParts(1)
+		        .build();
 
 		String input = json.writeValueAsString(expected);
 
@@ -80,6 +118,7 @@ public class MtBatchTextSmsCreateTest {
 		        "  'from': '1234',",
 		        "  'to': [ '987654321' ],",
 		        "  'body': 'Hello, world!',",
+		        "  'max_number_of_message_parts': 1,",
 		        "  'parameters': {",
 		        "    'param1': {",
 		        "      '123': 'foo',",
@@ -128,6 +167,7 @@ public class MtBatchTextSmsCreateTest {
 		        "  'from': '1234',",
 		        "  'to': [ '987654321' ],",
 		        "  'body': 'Hello, world!',",
+		        "  'max_number_of_message_parts': 1,",
 		        "  'parameters': {",
 		        "    'param1': {",
 		        "      '123': 'foo',",
@@ -168,6 +208,7 @@ public class MtBatchTextSmsCreateTest {
 		                ZoneOffset.UTC))
 		        .expireAt(OffsetDateTime.of(2016, 12, 20, 10, 0, 0, 0,
 		                ZoneOffset.UTC))
+		        .maxNumberOfMessageParts(1)
 		        .addTag("tag1", "tag2")
 		        .build();
 
@@ -179,6 +220,7 @@ public class MtBatchTextSmsCreateTest {
 		        "  'body': 'Hello, world!',",
 		        "  'send_at': '2016-12-01T10:20:30Z',",
 		        "  'expire_at': '2016-12-20T10:00:00Z',",
+		        "  'max_number_of_message_parts': 1,",
 		        "  'tags': ['tag1', 'tag2']",
 		        "}").replace('\'', '"');
 
@@ -218,7 +260,8 @@ public class MtBatchTextSmsCreateTest {
 		return ClxApi.batchTextSms()
 		        .sender("1234")
 		        .addRecipient("987654321")
-		        .body("Hello, world!");
+		        .body("Hello, world!")
+		        .maxNumberOfMessageParts(1);
 	}
 
 }

@@ -62,6 +62,7 @@ public abstract class MtBatchSmsCreate {
 	 * 
 	 * @return an originator address
 	 */
+	@Nullable
 	@JsonProperty("from")
 	public abstract String sender();
 
@@ -94,6 +95,15 @@ public abstract class MtBatchSmsCreate {
 	@Nullable
 	@JsonProperty("expire_at")
 	public abstract OffsetDateTime expireAt();
+	
+	/**
+	 * Message will be dispatched only if it is not split to more parts than Max Number of Message Parts. 
+	 * Must be higher or equal 1.
+	 * 
+	 * @return the max number of message parts
+	 */
+	@JsonProperty("max_number_of_message_parts")
+	public abstract int maxNumberOfMessageParts();
 
 	/**
 	 * The URL to which batch callbacks should be sent. If <code>null</code>
@@ -127,9 +137,13 @@ public abstract class MtBatchSmsCreate {
 			}
 		}
 
-		if (sender().isEmpty()) {
-			throw new IllegalStateException("empty from address");
+		if(maxNumberOfMessageParts() < 1) {
+			throw new IllegalStateException("maxNumberOfMessages less than 1 (minimum)");
 		}
+		// Could comment this out for speed or could add an extra parameter that specifies if the automatic default originator should be used
+//		if (sender().isEmpty()) {
+//			throw new IllegalStateException("empty from address");
+//		}
 	}
 
 }

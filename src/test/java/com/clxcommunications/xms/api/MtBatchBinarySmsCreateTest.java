@@ -43,6 +43,7 @@ public class MtBatchBinarySmsCreateTest {
 		        "  'from': '1234',",
 		        "  'to': [ '987654321' ],",
 		        "  'body': 'SGVsbG8sIHdvcmxkIQ==',",
+		        "  'max_number_of_message_parts': 1,",
 		        "  'udh': '01020304'",
 		        "}").replace('\'', '"');
 
@@ -68,6 +69,7 @@ public class MtBatchBinarySmsCreateTest {
 		        .sender("1234")
 		        .addRecipient("987654321")
 		        .body("Hello, world!".getBytes(TestUtils.US_ASCII))
+		        .maxNumberOfMessageParts(1)
 		        .udh(new byte[] { 1, 2, 3, 4 });
 	}
 

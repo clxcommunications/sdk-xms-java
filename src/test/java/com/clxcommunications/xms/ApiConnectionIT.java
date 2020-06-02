@@ -148,6 +148,7 @@ public class ApiConnectionIT {
 		                .addRecipient("987654321")
 		                .body("body".getBytes(TestUtils.US_ASCII))
 		                .udh("udh".getBytes(TestUtils.US_ASCII))
+		                .maxNumberOfMessageParts(1)
 		                .build();
 
 		MtBatchBinarySmsResult expected =
@@ -195,6 +196,7 @@ public class ApiConnectionIT {
 		                .addRecipient("123456789")
 		                .addRecipient("987654321")
 		                .body("Hello, world! Здравей свят!")
+		                .maxNumberOfMessageParts(1)
 		                .build();
 
 		MtBatchTextSmsResult expected =
@@ -241,6 +243,7 @@ public class ApiConnectionIT {
 		                .addRecipient("123456789")
 		                .addRecipient("987654321")
 		                .body("Hello, ${name}!")
+		                .maxNumberOfMessageParts(1)
 		                .putParameter("name",
 		                        ClxApi.parameterValues()
 		                                .putSubstitution("123456789", "Jane")
@@ -290,6 +293,7 @@ public class ApiConnectionIT {
 		                .addRecipient("123456789")
 		                .addRecipient("987654321")
 		                .body("Hello, world!")
+		                .maxNumberOfMessageParts(1)
 		                .build();
 
 		ApiError apiError = ApiError.of("syntax_constraint_violation",
@@ -327,6 +331,7 @@ public class ApiConnectionIT {
 		                .addRecipient("123456789")
 		                .addRecipient("987654321")
 		                .body("Hello, world!")
+		                .maxNumberOfMessageParts(1)
 		                .build();
 
 		String response = String.join("\n",
@@ -380,6 +385,7 @@ public class ApiConnectionIT {
 		                .addRecipient("123456789")
 		                .addRecipient("987654321")
 		                .body("Hello, world!")
+		                .maxNumberOfMessageParts(1)
 		                .build();
 
 		String response = String.join("\n",
@@ -443,6 +449,7 @@ public class ApiConnectionIT {
 		                .addRecipient("123456789")
 		                .addRecipient("987654321")
 		                .body("Hello, world!")
+		                .maxNumberOfMessageParts(1)
 		                .build();
 
 		String path = "/v1/" + spid + "/batches";
@@ -473,6 +480,7 @@ public class ApiConnectionIT {
 		                .addRecipient("123456789")
 		                .addRecipient("987654321")
 		                .body("Hello, world!")
+		                .maxNumberOfMessageParts(1)
 		                .build();
 
 		String path = "/v1/" + spid + "/batches";
@@ -520,6 +528,7 @@ public class ApiConnectionIT {
 		                .addRecipient("987654321")
 		                .body("body".getBytes(TestUtils.US_ASCII))
 		                .udh("udh".getBytes(TestUtils.US_ASCII))
+		                .maxNumberOfMessageParts(1)
 		                .build();
 
 		MtBatchBinarySmsResult expected =
@@ -568,6 +577,7 @@ public class ApiConnectionIT {
 		                .addRecipient("123456789")
 		                .addRecipient("987654321")
 		                .body("Hello, world!")
+		                .maxNumberOfMessageParts(1)
 		                .build();
 
 		MtBatchTextSmsResult expected =
@@ -1849,6 +1859,7 @@ public class ApiConnectionIT {
 		        .sender("1234")
 		        .addRecipient("987654321")
 		        .body("Hello, world!")
+		        .maxNumberOfMessageParts(1)
 		        .build();
 
 		final MtBatchDryRunResult expected =
@@ -1887,6 +1898,7 @@ public class ApiConnectionIT {
 		        .sender("1234")
 		        .addRecipient("987654321")
 		        .body("Hello, world!")
+		        .maxNumberOfMessageParts(1)
 		        .build();
 
 		final MtBatchDryRunResult expected =
